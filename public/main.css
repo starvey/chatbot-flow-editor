@@ -11,6 +11,8 @@ html {
   --dark-grey: rgba(83, 86, 87, 1);
   --side-bar-border-right: 1px solid var(--smoke); 
   --side-bar-padding: 20px;
+
+  overflow: hidden;
 }
 /* /variable */
 
@@ -64,7 +66,6 @@ body {
 
 .node-types__node-type {
   padding: 5px 10px;
-  border-radius: 3px;
   box-shadow: 1px 2px 1px 0px rgba(0,0,0,0.22);
   position: relative;
   width: 260px;
@@ -72,6 +73,8 @@ body {
   white-space: nowrap;
   text-overflow: ellipsis;
   box-sizing: border-box;
+  font-size: 16px;
+  font-family: Arial;
 }
 
 .node-types__node-type__icon {
