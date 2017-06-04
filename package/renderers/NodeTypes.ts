@@ -1,4 +1,5 @@
 import {FlowNodeType} from '../classes/FlowNodeType'
+import 'd3'
 
 export function addNodeType (nodeType: FlowNodeType) {
   const $list = document.querySelector('.side-bar__node-types')
@@ -15,5 +16,4 @@ export function addNodeType (nodeType: FlowNodeType) {
 }
 
 export function removeNodeType () {
-
 }

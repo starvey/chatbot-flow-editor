@@ -1,4 +1,5 @@
 import {  FlowNode  } from './classes/FlowNode'
+import {  FlowNodeType  } from './classes/FlowNodeType'
 
 class SyncEvent {
   handlers: Array<Function> = []
@@ -15,7 +16,7 @@ export class Store {
   nodeTypeUnregistered: SyncEvent = new SyncEvent()
   nodeTypes: Object = {}
 
-  public registerNodeType (newNodeType: FlowNode) {
+  public registerNodeType (newNodeType: FlowNodeType) {
       if (this.nodeTypes[newNodeType.slug]) {
         return Promise.reject('Another node type was registered using this slug')
       }
@@ -30,6 +31,28 @@ export class Store {
       }
       delete this.nodeTypes[nodeTypeSlug]
       this.nodeTypeUnregistered.post(nodeTypeSlug)
+      return Promise.resolve()
+  }
+
+  nodeRegistered: SyncEvent = new SyncEvent()
+  nodeUnregistered: SyncEvent = new SyncEvent()
+  nodes: Object = {}
+
+  public registerNode (newNode: FlowNode) {
+      if (this.nodeTypes[newNode.id]) {
+        return Promise.reject('Another node was registered using this id')
+      }
+      this.nodeTypes[newNode.id] = newNode
+      this.nodeTypeRegistered.post(newNode.id)
+      return Promise.resolve(newNode)
+  }
+
+  public unregisterNode (nodeId: string) {
+      if (!this.nodeTypes[nodeId]) {
+        return Promise.reject('No node associated with id')
+      }
+      delete this.nodeTypes[nodeId]
+      this.nodeTypeUnregistered.post(nodeId)
       return Promise.resolve()
   }
   
