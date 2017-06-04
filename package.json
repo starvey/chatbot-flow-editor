@@ -5,10 +5,16 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "tsc-watch": "tsc ./package/*.ts ./user/*.ts --outFile ./public/main.js",
+    "tsc-watch": "tsc ./package/*.ts ./user/*.ts --outDir ./public/platform --module amd --watch",
     "server": "python server.py --port 8000 --dir ./public/;",
-    "start:dev": "npm run tsc-watch && npm run server"
+    "start:dev": "npm run server & npm run tsc-watch"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "commonjs": "0.0.1"
+  },
+  "devDependencies": {
+    "@types/es6-shim": "^0.31.34"
+  }
 }
