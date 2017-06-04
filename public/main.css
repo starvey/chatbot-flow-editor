@@ -11,16 +11,15 @@ html {
   --dark-grey: rgba(83, 86, 87, 1);
   --side-bar-border-right: 1px solid var(--smoke); 
   --side-bar-padding: 20px;
+  --side-bar-translation: translateX(calc(var(--side-bar-width) * -1));
 
   overflow: hidden;
 }
 /* /variable */
 
 /* layout states */
-html.--side-bar-collapsed {
-  --side-bar-width: 0;
-  --side-bar-border-right: none;
-  --side-bar-padding: 0;
+html.--side-bar-expanded {
+  --side-bar-translation: translateX(0);
 }
 /* /layout state */
 
@@ -62,6 +61,8 @@ body {
   padding: var(--side-bar-padding);
   overflow: hidden;
   box-sizing: border-box;
+  position: absolute;
+  transform: var(--side-bar-translation);
 }
 
 .node-types__node-type {

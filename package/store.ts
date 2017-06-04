@@ -13,7 +13,7 @@ class PoolEvent {
       this.hasChanged = false
     }, delay)
   }
-  post (identifier: string) {
+  post (identifier?: string) {
     this.hasChanged = true
     this.pooledArguments.push(identifier)
   }
@@ -62,6 +62,13 @@ export class Store {
     delete this.nodes[nodeId]
     this.nodeUnregistered.post(nodeId)
     return Promise.resolve()
+  }
+
+  positionChanged: PoolEvent = new PoolEvent()
+  public position: object = null
+  public setCurrentPosition (position: object) {
+    this.position = position
+    this.positionChanged.post()
   }
   
 }

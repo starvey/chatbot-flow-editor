@@ -15,5 +15,12 @@ export class Platform {
       const nodes = Object.keys(this.store.nodes).map(k => this.store.nodes[k])
       flowRenderer.addNodes(nodes)
     })
+    this.store.positionChanged.attach(() => {
+      if (this.store.position !== null) {
+        nodeTypesRenderer.expand()
+      } else {
+        nodeTypesRenderer.collapse()
+      }
+    })
   }
 }

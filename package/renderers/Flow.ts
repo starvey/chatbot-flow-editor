@@ -24,9 +24,12 @@ export class FlowRenderer {
     this.canvasRect = $canvas.getBoundingClientRect()
     this.ctx = $canvas.getContext('2d')
     $canvas.addEventListener('mousedown', (event) => {
-      const mouseInRect = this.mouseInRect(this.getMousePosition(event))
+      const mousePosition = this.getMousePosition(event)
+      const mouseInRect = this.mouseInRect(mousePosition)
       if (mouseInRect) {
         this.rectangleDragStart(mouseInRect)
+      } else {
+        this.store.setCurrentPosition(mousePosition)
       }
     })
 
