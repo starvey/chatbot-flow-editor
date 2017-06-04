@@ -1,10 +1,21 @@
 import {  FlowNode  } from './classes/FlowNode'
 import {  FlowNodeType  } from './classes/FlowNodeType'
 
-class SyncEvent {
+class PoolEvent {
   handlers: Array<Function> = []
+  hasChanged: boolean = false
+  pooledArguments: Array<any> = []
+  constructor (delay = 1000/100) {
+    setInterval(() => {
+      if (this.hasChanged) {
+        this.handlers.forEach((h) => h(this.pooledArguments))
+      }
+      this.hasChanged = false
+    }, delay)
+  }
   post (identifier: string) {
-    this.handlers.forEach((h) => h(identifier))
+    this.hasChanged = true
+    this.pooledArguments.push(identifier)
   }
   attach (handler: Function) {
     this.handlers.push(handler)
@@ -12,8 +23,8 @@ class SyncEvent {
 }
 
 export class Store {
-  nodeTypeRegistered: SyncEvent = new SyncEvent()
-  nodeTypeUnregistered: SyncEvent = new SyncEvent()
+  nodeTypeRegistered: PoolEvent = new PoolEvent()
+  nodeTypeUnregistered: PoolEvent = new PoolEvent()
   nodeTypes: Object = {}
 
   public registerNodeType (newNodeType: FlowNodeType) {
@@ -34,14 +45,11 @@ export class Store {
     return Promise.resolve()
   }
 
-  nodeRegistered: SyncEvent = new SyncEvent()
-  nodeUnregistered: SyncEvent = new SyncEvent()
+  nodeRegistered: PoolEvent = new PoolEvent()
+  nodeUnregistered: PoolEvent = new PoolEvent()
   nodes: Object = {}
 
   public registerNode (newNode: FlowNode) {
-    if (this.nodeTypes[newNode.id]) {
-      return Promise.reject('Another node was registered using this id')
-    }
     this.nodes[newNode.id] = newNode
     this.nodeRegistered.post(newNode.id)
     return Promise.resolve(newNode)

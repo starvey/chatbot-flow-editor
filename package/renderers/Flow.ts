@@ -6,7 +6,7 @@ export class FlowRenderer {
   baseElement: HTMLCanvasElement
   ctx: CanvasRenderingContext2D
   store: Store
-  rectangleDragging: boolean = false
+  rectangleDragging: FlowNode = null
   elementsBox: object = {
     h: 31,
     w: 260
@@ -24,9 +24,9 @@ export class FlowRenderer {
     this.canvasRect = $canvas.getBoundingClientRect()
     this.ctx = $canvas.getContext('2d')
     $canvas.addEventListener('mousedown', (event) => {
-      const isMouseInRect = this.isMouseInRect(this.getMousePosition(event))
-      if (isMouseInRect) {
-        this.rectangleDragStart()
+      const mouseInRect = this.mouseInRect(this.getMousePosition(event))
+      if (mouseInRect) {
+        this.rectangleDragStart(mouseInRect)
       }
     })
 
@@ -46,15 +46,21 @@ export class FlowRenderer {
   }
 
   onRectangleDrag(event: MouseEvent) {
-    console.log(this.getMousePosition(event))
+    const mousePosition = this.getMousePosition(event)
+    const newXPosition = mousePosition.x - (this.elementsBox['w']/2)
+    const newYPosition = mousePosition.y - (this.elementsBox['h']/2)
+    this.rectangleDragging.x = newXPosition
+    this.rectangleDragging.y = newYPosition
+    this.store.registerNode(this.rectangleDragging)
+
   }
 
-  rectangleDragStart() {
-    this.rectangleDragging = true
+  rectangleDragStart(mouseInRect: FlowNode) {
+    this.rectangleDragging = mouseInRect
   }
 
   rectangleDragStop() {
-    this.rectangleDragging = false
+    this.rectangleDragging = null
   }
 
   getMousePosition(event: MouseEvent) {
@@ -64,17 +70,16 @@ export class FlowRenderer {
     }
   }
 
-  isMouseInRect({x, y}) {
+  mouseInRect({x, y}) {
     return Object.keys(this.store.nodes).map(k => this.store.nodes[k]).filter((node: FlowNode) => {
       return  node.x < x &&
               (node.x + this.elementsBox['w']) > x &&
               node.y < y &&
               (node.y + this.elementsBox['h']) > y
-    }).length > 0
+    })[0]
   }
 
   drawRect ({node, nodeType}) {
-    this.ctx.save()
     this.ctx.rect(node.x, node.y, this.elementsBox['w'], this.elementsBox['h'])
     this.ctx.fillStyle = nodeType.backgroundColor
     this.ctx.shadowColor = 'rgba(0,0,0,0.22)'
@@ -82,7 +87,6 @@ export class FlowRenderer {
     this.ctx.shadowOffsetX = 0
     this.ctx.shadowOffsetY = 1
     this.ctx.fill()
-    this.ctx.restore()
     return Promise.resolve({node, nodeType})
   }
 
@@ -106,11 +110,16 @@ export class FlowRenderer {
 
   addNodes (nodes: Array<FlowNode>) {
     this.ctx.clearRect(0, 0, this.canvasRect.width, this.canvasRect.height);
-    nodes.forEach((node) => {
-      const nodeType = this.store.nodeTypes[node.flowNodeTypeSlug]
-      this.drawRect({node, nodeType})
-        .then(this.drawIcon.bind(this))
-        .then(this.drawLabel.bind(this))
-    })
+    nodes.reduce((agg, node) => {
+      return agg.then(() => new Promise((resolve) => {
+        const nodeType = this.store.nodeTypes[node.flowNodeTypeSlug]
+        this.ctx.beginPath()
+        this.drawRect({node, nodeType})
+          //.then(this.drawIcon.bind(this))  // This sadly makes it blinks too much to be viable. Sad, sad.
+          .then(this.drawLabel.bind(this))
+          .then(() => this.ctx.closePath())
+          .then(() => resolve())
+      }))
+    }, Promise.resolve({}))
   }
 }

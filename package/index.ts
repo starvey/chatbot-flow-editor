@@ -8,8 +8,8 @@ export class Platform {
     this.store = new Store()
     const nodeTypesRenderer = new NodeTypesRenderer(this.store)
     const flowRenderer = new FlowRenderer(this.store)
-    this.store.nodeTypeRegistered.attach((slug) => {
-      nodeTypesRenderer.addNodeType(this.store.nodeTypes[slug])
+    this.store.nodeTypeRegistered.attach((pooledSlugs) => {
+      pooledSlugs.forEach((slug) => nodeTypesRenderer.addNodeType(this.store.nodeTypes[slug]))
     })
     this.store.nodeRegistered.attach((id) => {
       const nodes = Object.keys(this.store.nodes).map(k => this.store.nodes[k])
