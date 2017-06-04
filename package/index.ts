@@ -12,7 +12,8 @@ export class Platform {
       nodeTypesRenderer.addNodeType(this.store.nodeTypes[slug])
     })
     this.store.nodeRegistered.attach((id) => {
-      flowRenderer.addNode(this.store.nodes[id])
+      const nodes = Object.keys(this.store.nodes).map(k => this.store.nodes[k])
+      flowRenderer.addNodes(nodes)
     })
   }
 }

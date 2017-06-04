@@ -6,9 +6,9 @@ export class FlowRenderer {
   baseElement: HTMLCanvasElement
   ctx: CanvasRenderingContext2D
   store: Store
-  elements: object= {}
+  rectangleDragging: boolean = false
   elementsBox: object = {
-    h: 30,
+    h: 31,
     w: 260
   }
   canvasRect: ClientRect;
@@ -24,8 +24,37 @@ export class FlowRenderer {
     this.canvasRect = $canvas.getBoundingClientRect()
     this.ctx = $canvas.getContext('2d')
     $canvas.addEventListener('mousedown', (event) => {
-      console.log(this.getMousePosition(event))
+      const isMouseInRect = this.isMouseInRect(this.getMousePosition(event))
+      if (isMouseInRect) {
+        this.rectangleDragStart()
+      }
     })
+
+    $canvas.addEventListener('mouseup', (event) => {
+      this.rectangleDragStop()
+    })
+
+    $canvas.addEventListener('mouseleave', (event) => {
+      this.rectangleDragStop()
+    })
+
+    $canvas.addEventListener('mousemove', (event) => {
+      if(this.rectangleDragging) {
+        this.onRectangleDrag(event)
+      }
+    })
+  }
+
+  onRectangleDrag(event: MouseEvent) {
+    console.log(this.getMousePosition(event))
+  }
+
+  rectangleDragStart() {
+    this.rectangleDragging = true
+  }
+
+  rectangleDragStop() {
+    this.rectangleDragging = false
   }
 
   getMousePosition(event: MouseEvent) {
@@ -33,6 +62,15 @@ export class FlowRenderer {
       x: event.clientX - this.canvasRect.left,
       y: event.clientY - this.canvasRect.top
     }
+  }
+
+  isMouseInRect({x, y}) {
+    return Object.keys(this.store.nodes).map(k => this.store.nodes[k]).filter((node: FlowNode) => {
+      return  node.x < x &&
+              (node.x + this.elementsBox['w']) > x &&
+              node.y < y &&
+              (node.y + this.elementsBox['h']) > y
+    }).length > 0
   }
 
   drawRect ({node, nodeType}) {
@@ -66,13 +104,13 @@ export class FlowRenderer {
     return Promise.resolve({node, nodeType})
   }
 
-  addNode (node) {
-    const nodeType = this.store.nodeTypes[node.flowNodeTypeSlug]
-    this.drawRect({node, nodeType})
-      .then(this.drawIcon.bind(this))
-      .then(this.drawLabel.bind(this))
-  }
-
-  removeNode () {
+  addNodes (nodes: Array<FlowNode>) {
+    this.ctx.clearRect(0, 0, this.canvasRect.width, this.canvasRect.height);
+    nodes.forEach((node) => {
+      const nodeType = this.store.nodeTypes[node.flowNodeTypeSlug]
+      this.drawRect({node, nodeType})
+        .then(this.drawIcon.bind(this))
+        .then(this.drawLabel.bind(this))
+    })
   }
 }
