@@ -6,7 +6,7 @@ export class FlowNode {
   x: number
   y: number
   f__name: string
-  ports: Array<FlowPort>
+  ports: object = {}
 
   constructor ({flowNodeTypeSlug, x, y}) {
     this.id = guid()

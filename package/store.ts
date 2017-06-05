@@ -5,7 +5,7 @@ class PoolEvent {
   handlers: Array<Function> = []
   hasChanged: boolean = false
   pooledArguments: Array<any> = []
-  constructor (delay = 1000/100) {
+  constructor (delay = 1000/25) {
     setInterval(() => {
       if (this.hasChanged) {
         this.handlers.forEach((h) => h(this.pooledArguments))
