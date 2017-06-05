@@ -17,5 +17,5 @@ export class WebApiNodeType extends FlowNodeType {
 }
 
 export class MessageNode extends FlowNode {
-  f__message: string
+  message: string
 }

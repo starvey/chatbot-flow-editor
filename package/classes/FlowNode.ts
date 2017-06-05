@@ -5,7 +5,7 @@ export class FlowNode {
   flowNodeTypeSlug: string
   x: number
   y: number
-  f__name: string
+  name: string
   ports: object = {}
 
   constructor ({flowNodeTypeSlug, x, y}) {

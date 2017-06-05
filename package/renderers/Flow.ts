@@ -26,11 +26,17 @@ export class FlowRenderer {
     $canvas.setAttribute('id', 'content-canvas')
     this.baseElement = $canvas
     this.ctx = $canvas.getContext('2d')
+
     $canvas.addEventListener('mousedown', (event) => {
       const mousePosition = this.getMousePosition(event)
       const mouseInRect = this.mouseInRect(mousePosition)
+
       if (mouseInRect) {
-        this.dragStart(mousePosition, mouseInRect)
+        if (event.shiftKey) {
+          this.onNodeClick(mouseInRect)
+        } else {
+          this.dragStart(mousePosition, mouseInRect)
+        } 
       } else {
         this.store.setCurrentPosition(mousePosition)
       }
@@ -63,6 +69,10 @@ export class FlowRenderer {
     })
 
     //this.canvasRect = this.canvasRectlive
+  }
+
+  onNodeClick(mouseInRect) {
+    this.store.setSelectedNode(mouseInRect)
   }
 
   onPortDrag(event: MouseEvent) {
@@ -160,7 +170,7 @@ export class FlowRenderer {
     this.ctx.beginPath()
     this.ctx.font = '16px Arial'
     this.ctx.fillStyle = nodeType.fontColor
-    this.ctx.fillText(nodeType.name, node.x+35, node.y+20)
+    this.ctx.fillText(node.name || nodeType.name, node.x+35, node.y+20)
     this.ctx.closePath()
     return Promise.resolve({node, nodeType})
   }

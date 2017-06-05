@@ -70,5 +70,12 @@ export class Store {
     this.position = position
     this.positionChanged.post()
   }
+
+  nodeSelected: PoolEvent = new PoolEvent()
+  public selectedNode: FlowNode = null
+  public setSelectedNode (node: FlowNode) {
+    this.selectedNode = node
+    this.nodeSelected.post()
+  }
   
 }
