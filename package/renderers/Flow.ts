@@ -198,6 +198,12 @@ export class FlowRenderer {
       this.ctx.beginPath()
       this.ctx.moveTo(fromX, fromY)
       this.ctx.lineTo(toX, toY)
+      let gradient= this.ctx.createLinearGradient(fromX,fromY,toX,toY)
+      gradient.addColorStop(0,"green")
+      gradient.addColorStop(0.5, "yellow")
+      gradient.addColorStop(1.0, "red")
+      this.ctx.strokeStyle = gradient
+      this.ctx.lineWidth = 3
       this.ctx.stroke()
       this.ctx.closePath()
     })
